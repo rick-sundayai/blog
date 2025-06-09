@@ -1,103 +1,132 @@
+// src/app/page.tsx
 import Image from "next/image";
+import Link from "next/link";
+import { getLatestPosts } from "@/services/postService";
+import { Post } from "@/types";
 
-export default function Home() {
+export default async function Home() {
+  const latestPosts = await getLatestPosts(6);
+  const featuredPosts = latestPosts.slice(0, 2);
+  const recentPosts = latestPosts.slice(2);
+  
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Hero Section */}
+      <section className="py-12 md:py-20 text-center">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          <span className="text-gray-900">Tech.</span>{" "}
+          <span className="text-gray-900">Travel.</span>{" "}
+          <span className="text-blue-500">Experience.</span>
+        </h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+          Exploring the digital landscape and the physical world, one story at a time. 
+          Join me on this journey of discovery and innovation.
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link 
+            href="/tech" 
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Tech Stories
+          </Link>
+          <Link 
+            href="/travel" 
+            className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
           >
-            Read our docs
-          </a>
+            Travel Adventures
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Featured Stories Section */}
+      <section className="py-12">
+        <h2 className="text-3xl font-bold mb-8">Featured Stories</h2>
+        <div className="space-y-12">
+          {featuredPosts.map((post) => (
+            <div key={post.id} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div className="relative h-64 md:h-96 w-full">
+                <Image
+                  src={post.featured_image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c'}
+                  alt={post.title}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold mb-3">
+                  <Link href={`/blog/${post.slug}`} className="text-gray-900 hover:text-blue-600">
+                    {post.title}
+                  </Link>
+                </h3>
+                <p className="text-gray-700 mb-4">
+                  {post.excerpt || (post.content.length > 200
+                    ? `${post.content.substring(0, 200)}...`
+                    : post.content)}
+                </p>
+                <div className="flex items-center text-sm text-gray-500 mb-4">
+                  <span>{new Date(post.published_at || post.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}</span>
+                  <span className="mx-2">•</span>
+                  <span>{Math.ceil(post.content.length / 1000)} min read</span>
+                </div>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Read More →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Recent Articles Section */}
+      <section className="py-12">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold">Recent Articles</h2>
+          <div className="flex space-x-2">
+            <button className="px-3 py-1 rounded-full bg-gray-900 text-white text-sm">All</button>
+            <button className="px-3 py-1 rounded-full bg-white text-gray-700 text-sm hover:bg-gray-100">Tech</button>
+            <button className="px-3 py-1 rounded-full bg-white text-gray-700 text-sm hover:bg-gray-100">Travel</button>
+            <button className="px-3 py-1 rounded-full bg-white text-gray-700 text-sm hover:bg-gray-100">Experience</button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {recentPosts.map((post) => (
+            <div key={post.id} className="bg-white rounded-lg overflow-hidden">
+              <div className="relative h-48 w-full">
+                <Image
+                  src={post.featured_image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c'}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-2">
+                  <Link href={`/blog/${post.slug}`} className="text-gray-900 hover:text-blue-600">
+                    {post.title}
+                  </Link>
+                </h3>
+                <div className="flex items-center text-sm text-gray-500 mb-4">
+                  <span>{new Date(post.published_at || post.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}</span>
+                  <span className="mx-2">•</span>
+                  <span>{Math.ceil(post.content.length / 1000)} min read</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
