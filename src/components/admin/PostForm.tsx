@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { Post } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 // Define the schema for post validation
 const postSchema = z.object({
@@ -73,6 +73,8 @@ export const PostForm = ({ post, isEditing = false }: PostFormProps) => {
         published_at: validatedData.status === 'published' ? new Date().toISOString() : null,
       };
 
+      const supabase = createClient();
+      
       if (isEditing && post) {
         // Update existing post
         const { error } = await supabase

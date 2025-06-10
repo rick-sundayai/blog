@@ -1,8 +1,9 @@
 // src/services/postService.ts
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { Post } from '@/types';
 
 export async function getPosts() {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from('posts')
     .select('*, author:users(full_name, avatar_url)')
@@ -14,6 +15,7 @@ export async function getPosts() {
 }
 
 export async function getPostBySlug(slug: string) {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from('posts')
     .select('*, author:users(full_name, avatar_url)')
@@ -26,6 +28,7 @@ export async function getPostBySlug(slug: string) {
 }
 
 export async function getPostsByCategory(categorySlug: string) {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from('posts')
     .select('*, author:users(full_name, avatar_url), categories!post_categories(id, name, slug)')
@@ -38,6 +41,7 @@ export async function getPostsByCategory(categorySlug: string) {
 }
 
 export async function getLatestPosts(limit = 3) {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from('posts')
     .select('*, author:users(full_name, avatar_url)')
@@ -50,6 +54,7 @@ export async function getLatestPosts(limit = 3) {
 }
 
 export async function getCategories() {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from('categories')
     .select('*')

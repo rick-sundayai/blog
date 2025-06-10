@@ -1,52 +1,38 @@
-'use client';
+// Admin dashboard page protected by authenticated layout
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
+import QuickActions from '@/components/admin/QuickActions';
 
-export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    totalPosts: 0,
-    publishedPosts: 0,
-    draftPosts: 0,
-  });
-
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        // In a real app, you'd fetch these stats from Supabase
-        // const { data: posts } = await supabase.from('posts').select('status');
-        
-        // For now, use mock data
-        const mockPosts = [
-          { status: 'published' },
-          { status: 'published' },
-          { status: 'published' },
-          { status: 'draft' },
-          { status: 'draft' },
-        ];
-        
-        const totalPosts = mockPosts.length;
-        const publishedPosts = mockPosts.filter(post => post.status === 'published').length;
-        const draftPosts = mockPosts.filter(post => post.status === 'draft').length;
-        
-        setStats({
-          totalPosts,
-          publishedPosts,
-          draftPosts,
-        });
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      }
-    }
-    
-    fetchStats();
-  }, []);
+export default async function AdminDashboard() {
+  // Get the authenticated user
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // Fetch post statistics
+  // In a real app, you'd fetch these stats from Supabase
+  // const { data: posts } = await supabase.from('posts').select('status');
+  
+  // For now, use mock data
+  const mockPosts = [
+    { status: 'published' },
+    { status: 'published' },
+    { status: 'published' },
+    { status: 'draft' },
+    { status: 'draft' },
+  ];
+  
+  const stats = {
+    totalPosts: mockPosts.length,
+    publishedPosts: mockPosts.filter(post => post.status === 'published').length,
+    draftPosts: mockPosts.filter(post => post.status === 'draft').length,
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-gray-600 mt-2">Manage your blog content and settings</p>
+        <p className="text-sm text-gray-500 mt-1">Logged in as: {user?.email}</p>
       </div>
       
       {/* Stats Cards */}
@@ -66,35 +52,7 @@ export default function AdminDashboard() {
       </div>
       
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link
-            href="/admin/posts/new"
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Create New Post
-          </Link>
-          <Link
-            href="/admin/posts"
-            className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Manage Posts
-          </Link>
-          <button
-            className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-            onClick={() => alert('This would open the n8n workflow editor')}
-          >
-            Manage Workflows
-          </button>
-          <button
-            className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-            onClick={() => alert('This would open the Supabase dashboard')}
-          >
-            Database Settings
-          </button>
-        </div>
-      </div>
+      <QuickActions />
       
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow-md p-6">
