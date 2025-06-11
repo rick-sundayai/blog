@@ -10,7 +10,7 @@ export type Post = {
   created_at: string;
   updated_at: string;
   published_at?: string;
-  status: 'draft' | 'published';
+  status: "draft" | "published";
   category?: string;
   categories?: Category[];
 };

@@ -5,9 +5,9 @@ import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  // Access slug directly from params object
-  const slug = params.slug;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  // Await params since it's a Promise in Next.js 15
+  const { slug } = await params;
   const post = await getPostBySlug(slug);
   
   if (!post) {
@@ -43,9 +43,9 @@ function formatDate(dateString: string) {
   }).format(date);
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  // Access slug directly from params object
-  const slug = params.slug;
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Await params since it's a Promise in Next.js 15
+  const { slug } = await params;
   const post = await getPostBySlug(slug);
   
   if (!post) {

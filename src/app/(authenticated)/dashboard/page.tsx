@@ -12,7 +12,6 @@ export default async function DashboardPage() {
         <h2 className="text-xl font-semibold mb-4">User Profile</h2>
         <div className="space-y-2">
           <p><span className="font-medium">Email:</span> {user?.email}</p>
-          <p><span className="font-medium">ID:</span> {user?.id}</p>
           <p><span className="font-medium">Last Sign In:</span> {user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'N/A'}</p>
         </div>
         <div className="mt-6">
