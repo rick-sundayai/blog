@@ -15,3 +15,4 @@ export async function POST(request: Request) {
     status: 307, // Use 307 for temporary redirect with POST
   });
 }
+ 

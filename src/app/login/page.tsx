@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(
     searchParams.get('error') 
       ? `${searchParams.get('error')}: ${searchParams.get('error_description')}`
@@ -126,6 +128,18 @@ export default function LoginPage() {
             </div>
           </div>
 
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={() => setShowResetForm(true)}
+                className="text-sm text-indigo-600 hover:text-indigo-500"
+              >
+                Forgot your password?
+              </button>
+            </div>
+          </div>
+          
           <div>
             <button
               type="submit"
@@ -165,6 +179,90 @@ export default function LoginPage() {
             </button>
           </div>
         </div>
+        
+        {/* Password Reset Modal */}
+        {showResetForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Reset your password</h3>
+              
+              {resetEmailSent ? (
+                <div className="mb-4">
+                  <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+                    <p className="text-sm text-green-700">Password reset email sent! Check your inbox.</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowResetForm(false);
+                      setResetEmailSent(false);
+                    }}
+                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Return to login
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setLoading(true);
+                  setError(null);
+                  
+                  try {
+                    const supabase = createClient();
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                      redirectTo: `${window.location.origin}/reset-password`,
+                    });
+                    
+                    if (error) {
+                      setError(error.message);
+                      return;
+                    }
+                    
+                    setResetEmailSent(true);
+                  } catch (err) {
+                    setError('An unexpected error occurred');
+                    console.error('Password reset error:', err);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}>
+                  <div className="mb-4">
+                    <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email address
+                    </label>
+                    <input
+                      id="reset-email"
+                      type="email"
+                      required
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="mt-6 flex justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowResetForm(false)}
+                      className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      {loading ? 'Sending...' : 'Send Reset Link'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
+        
       </div>
     </div>
   );
