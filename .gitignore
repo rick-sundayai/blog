@@ -41,3 +41,18 @@ next-env.d.ts
 .idea/
 *.swp
 *.swo
+
+# Claude / assistant tool files (ignore generated caches, logs, outputs, sessions)
+# adjust the patterns to match the actual folder names your tools create
+.claude/
+claude/
+claude-*
+claude_output/
+claude-outputs/
+claude_cache/
+claude_cache/*
+claude_sessions/
+claude_logs/
+*.claude
+*.claude.json
+claude*.log
