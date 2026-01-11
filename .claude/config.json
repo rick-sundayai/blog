@@ -1,0 +1,13 @@
+{
+  "allowed_tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "LS", "Skill"],
+  "skills": {
+    "enabled": true,
+    "auto_load": true
+  },
+  "project_settings": {
+    "name": "Sunday AI Work",
+    "type": "nextjs-supabase-auth-blog",
+    "skills_directory": ".claude/skills",
+    "description": "AI, Automation, and Modern Tech Blog Platform"
+  }
+}
