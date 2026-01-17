@@ -1,0 +1,146 @@
+{
+  "name": "Generate Blog Post with AI (Gemini)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-blog-post",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        460,
+        340
+      ],
+      "webhookId": "generate-blog-post"
+    },
+    {
+      "parameters": {
+        "modelId": "gemini-pro",
+        "prompt": "=Generate a comprehensive tech blog post in Markdown format based on this title: \"{{ $json.body.title }}\". \n\nContext/Excerpt: \"{{ $json.body.excerpt }}\"\n\nAlso provide a short 2-3 sentence excerpt if one isn't provided.\n\nReturn a JSON object with two keys: \"content\" (the markdown text) and \"excerpt\" (the string). Do not include markdown code fencing around the JSON.",
+        "options": {}
+      },
+      "id": "generate-content",
+      "name": "Google Gemini Chat",
+      "type": "n8n-nodes-base.googleGeminiChat",
+      "typeVersion": 1,
+      "position": [
+        680,
+        340
+      ],
+      "credentials": {
+        "googleGeminiApi": {
+          "id": "GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "prompt": "=Technological, futuristic, abstract header image for a blog post titled: {{ $json.body.title }}. High quality, 4k, digital art, neon accents.",
+        "n": 1,
+        "size": "1024x1024",
+        "responseFormat": "url"
+      },
+      "id": "generate-image",
+      "name": "OpenAI Image Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        680,
+        540
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      },
+      "notes": "Kept as OpenAI for Image Generation as Gemini Image Gen might vary in availability. Swap if needed."
+    },
+    {
+      "parameters": {
+        "mode": "json",
+        "jsonOutput": "={\n  \"content\": {{ JSON.parse($('generate-content').item.json.content).content }},\n  \"excerpt\": {{ JSON.parse($('generate-content').item.json.content).excerpt }},\n  \"featured_image_url\": {{ $('generate-image').item.json.data[0].url }}\n}",
+        "options": {}
+      },
+      "id": "format-response",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        900,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-to-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        440
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Gemini Chat",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI Image Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Image Generator": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

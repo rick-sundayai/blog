@@ -1,9 +1,18 @@
 // Authentication Types
 export interface User {
   id: string
-  email: string
-  emailConfirmed: boolean
-  createdAt: string
+  email?: string
+  email_confirmed_at?: string
+  last_sign_in_at?: string
+  created_at: string
+  updated_at?: string
+  app_metadata?: {
+    provider?: string
+    [key: string]: any
+  }
+  user_metadata?: {
+    [key: string]: any
+  }
 }
 
 export interface UserProfile {

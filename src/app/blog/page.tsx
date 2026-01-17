@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Eye } from 'lucide-react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import { useBlogPosts, useBlogCategories } from '@/lib/queries/blog'
@@ -31,9 +31,10 @@ export default function BlogPage() {
     setActiveCategory(category === 'All' ? '' : category.toLowerCase())
   }
 
-  const handlePostClick = (postId: string) => {
-    trackView.mutate({ postId })
-  }
+  // No longer needed as ViewTracker is on the destination page
+  // const handlePostClick = (postId: string) => {
+  //   trackView.mutate({ postId })
+  // }
 
   if (error) {
     return (
@@ -128,7 +129,6 @@ export default function BlogPage() {
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}
-                  onClick={() => handlePostClick(post.id)}
                   className="group bg-card rounded-xl border border-border hover:border-primary/50 transition-all duration-300 overflow-hidden card-glow block"
                 >
                   {/* Post Image */}
@@ -161,9 +161,15 @@ export default function BlogPage() {
                           {post.category.name}
                         </span>
                       )}
-                      <span className="text-sm text-muted-foreground">
-                        {post.read_time_minutes} min read
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground">
+                          {post.read_time_minutes} min read
+                        </span>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>{post.view_count || 0}</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Title */}
@@ -178,7 +184,7 @@ export default function BlogPage() {
 
                     {/* Date and Read More */}
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm text-muted-foreground" suppressHydrationWarning>
                         {post.published_at ? new Date(post.published_at).toLocaleDateString() : 'Draft'}
                       </span>
                       <span className="text-primary hover:text-primary/80 font-medium text-sm flex items-center group">

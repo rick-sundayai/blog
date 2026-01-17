@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, Clock, Eye, User } from 'lucide-react'
 import Header from '@/components/Header'
+import ViewTracker from '@/components/ViewTracker'
 import { createClient } from '@/lib/supabase/server'
 import { TABLE_NAMES } from '@/lib/types/blog'
 
 interface BlogPostPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 // Server-side data fetching for SEO and initial load
@@ -58,7 +59,8 @@ async function getBlogPost(slug: string) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = await getBlogPost(params.slug)
+  const { slug } = await params
+  const post = await getBlogPost(slug)
   
   if (!post) {
     return {
@@ -72,7 +74,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     description: post.excerpt,
     keywords: [
       post.category?.name || '',
-      ...post.tags.map(tag => tag.name),
+      ...post.tags.map((tag: any) => tag.name),
       'AI',
       'automation',
       'technology',
@@ -102,7 +104,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getBlogPost(params.slug)
+  const { slug } = await params
+  const post = await getBlogPost(slug)
 
   if (!post) {
     notFound()
@@ -122,6 +125,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <Header />
       
       <main className="pt-20 pb-16">
+        <ViewTracker postId={post.id} />
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back to Blog */}
           <div className="mb-8">
@@ -133,6 +137,37 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               Back to Blog
             </Link>
           </div>
+
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'BlogPosting',
+                headline: post.title,
+                description: post.excerpt,
+                image: post.featured_image_url ? [post.featured_image_url] : [],
+                datePublished: post.published_at,
+                dateModified: post.updated_at || post.published_at,
+                author: {
+                  '@type': 'Person',
+                  name: post.author?.full_name || 'Sunday AI Work',
+                },
+                publisher: {
+                  '@type': 'Organization',
+                  name: 'Sunday AI Work',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: 'https://sundayaiwork.com/logo.png', // Update with actual logo URL if available
+                  },
+                },
+                mainEntityOfPage: {
+                  '@type': 'WebPage',
+                  '@id': `https://sundayaiwork.com/blog/${slug}`,
+                },
+              }),
+            }}
+          />
 
           {/* Article Header */}
           <header className="mb-12">
@@ -172,7 +207,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               {/* Published Date */}
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                <span>{publishedDate}</span>
+                <span suppressHydrationWarning>{publishedDate}</span>
               </div>
 
               {/* Read Time */}
@@ -224,7 +259,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="mb-12">
               <h3 className="text-lg font-semibold mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
+                {post.tags.map((tag: any) => (
                   <span
                     key={tag.id}
                     className="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-full hover:bg-muted/80 transition-colors"

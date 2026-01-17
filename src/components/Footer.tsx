@@ -6,7 +6,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   const socialLinks = [
-    { name: 'GitHub', icon: Github, href: 'https://github.com' },
+    { name: 'GitHub', icon: Github, href: 'https://github.com/rick-sundayai' },
     { name: 'Twitter', icon: Twitter, href: 'https://twitter.com' },
     { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com' },
     { name: 'Email', icon: Mail, href: 'mailto:hello@sundayaiwork.com' },

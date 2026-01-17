@@ -152,7 +152,7 @@ export function useBlogPost(slug: string, enabled = true) {
 /**
  * Fetch all blog posts for admin (includes drafts)
  */
-export function useAdminBlogPosts(filters: BlogPostFilters = {}) {
+export function useAdminBlogPosts(filters: BlogPostFilters = {}, enabled = true) {
   return useQuery({
     queryKey: ['admin-blog-posts', filters],
     queryFn: async (): Promise<BlogPost[]> => {
@@ -199,7 +199,62 @@ export function useAdminBlogPosts(filters: BlogPostFilters = {}) {
 
       return data || []
     },
+    enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes for admin data
+  })
+}
+
+/**
+ * Fetch a single blog post by ID for admin (editing)
+ */
+export function useAdminBlogPost(id: string) {
+  return useQuery({
+    queryKey: ['admin-blog-post', id],
+    queryFn: async (): Promise<BlogPostWithRelations> => {
+      const supabase = createClient()
+
+      const { data, error } = await supabase
+        .from(TABLE_NAMES.BLOG_POSTS)
+        .select(`
+          *,
+          category:blog_categories!blog_posts_category_id_fkey(
+            id,
+            name,
+            slug,
+            description,
+            color
+          ),
+          tags:post_tags!post_tags_post_id_fkey(
+            blog_tags!post_tags_tag_id_fkey(
+              id,
+              name,
+              slug
+            )
+          ),
+          author:user_profiles!blog_posts_author_id_fkey(
+            user_id,
+            full_name,
+            email,
+            avatar_url
+          )
+        `)
+        .eq('id', id)
+        .single()
+
+      if (error) {
+        throw new Error(`Failed to fetch blog post: ${error.message}`)
+      }
+
+      // Transform tags data structure
+      const transformedData = {
+        ...data,
+        tags: data.tags?.map((tag: { blog_tags: any }) => tag.blog_tags).filter(Boolean) || [],
+      }
+
+      return transformedData
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   })
 }
 

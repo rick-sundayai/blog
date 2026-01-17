@@ -36,7 +36,7 @@ export interface BlogPost {
   created_at: string
   updated_at: string
   // Relations
-  category?: BlogCategory
+  category?: BlogCategory | null
   tags?: BlogTag[]
   author?: {
     id: string
@@ -95,10 +95,13 @@ export interface CreateBlogPostForm {
   status: 'draft' | 'published'
   category_id?: string
   tag_ids?: string[]
+  slug?: string
+  author_id: string
 }
 
 export interface UpdateBlogPostForm extends Partial<CreateBlogPostForm> {
   id: string
+  published_at?: string
 }
 
 export interface CreateCategoryForm {
@@ -135,7 +138,7 @@ export interface BlogPostsResponse {
 }
 
 export interface BlogPostWithRelations extends BlogPost {
-  category: BlogCategory | null
+  category: BlogCategory | null | undefined
   tags: BlogTag[]
   author: {
     id: string

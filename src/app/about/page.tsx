@@ -3,7 +3,7 @@ import Header from '@/components/Header'
 
 export default function AboutPage() {
   const socialLinks = [
-    { name: 'GitHub', icon: Github, href: 'https://github.com', color: 'hover:text-gray-300' },
+    { name: 'GitHub', icon: Github, href: 'https://github.com/rick-sundayai', color: 'hover:text-gray-300' },
     { name: 'Twitter', icon: Twitter, href: 'https://twitter.com', color: 'hover:text-blue-400' },
     { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com', color: 'hover:text-blue-500' },
     { name: 'Email', icon: Mail, href: 'mailto:hello@sundayaiwork.com', color: 'hover:text-green-400' },
