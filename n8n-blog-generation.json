@@ -20,7 +20,7 @@
     {
       "parameters": {
         "modelId": "gemini-pro",
-        "prompt": "=Generate a comprehensive tech blog post in Markdown format based on this title: \"{{ $json.body.title }}\". \n\nContext/Excerpt: \"{{ $json.body.excerpt }}\"\n\nAlso provide a short 2-3 sentence excerpt if one isn't provided.\n\nReturn a JSON object with two keys: \"content\" (the markdown text) and \"excerpt\" (the string). Do not include markdown code fencing around the JSON.",
+        "prompt": "=Generate a comprehensive tech blog post in Markdown format based on this title/description: \"{{ $json.body.title }}\" and context: \"{{ $json.body.content }}\". \n\nAlso provide a short 2-3 sentence excerpt.\n\nReturn a JSON object with three keys: \"title\" (a catchy title), \"content\" (the markdown text) and \"excerpt\" (the string). Do not include markdown code fencing around the JSON.",
         "options": {}
       },
       "id": "generate-content",
@@ -64,7 +64,7 @@
     {
       "parameters": {
         "mode": "json",
-        "jsonOutput": "={\n  \"content\": {{ JSON.parse($('generate-content').item.json.content).content }},\n  \"excerpt\": {{ JSON.parse($('generate-content').item.json.content).excerpt }},\n  \"featured_image_url\": {{ $('generate-image').item.json.data[0].url }}\n}",
+        "jsonOutput": "={\n  \"title\": {{ JSON.parse($('generate-content').item.json.content).title }},\n  \"content\": {{ JSON.parse($('generate-content').item.json.content).content }},\n  \"excerpt\": {{ JSON.parse($('generate-content').item.json.content).excerpt }},\n  \"featured_image_url\": {{ $('generate-image').item.json.data[0].url }}\n}",
         "options": {}
       },
       "id": "format-response",

@@ -22,6 +22,8 @@ export async function POST(req: Request) {
       )
     }
 
+    console.log('Sending request to n8n:', { url: n8nWebhookUrl, body })
+
     const response = await fetch(n8nWebhookUrl, {
       method: 'POST',
       headers: {
@@ -31,16 +33,51 @@ export async function POST(req: Request) {
     })
 
     if (!response.ok) {
-      throw new Error(`n8n responded with status: ${response.status}`)
+      let errorMessage = `n8n responded with status: ${response.status}`
+      try {
+        const errorData = await response.json()
+        if (errorData && errorData.message) {
+          errorMessage = errorData.message
+        } else if (errorData && typeof errorData.error === 'string') {
+          errorMessage = errorData.error
+        }
+      } catch (e) {
+        // If not JSON, try text
+        try {
+          const errorText = await response.text()
+          if (errorText) errorMessage = errorText
+        } catch (t_err) {
+          // Ignore text parsing errors
+        }
+      }
+      
+      console.error(`n8n error detail:`, errorMessage)
+      return NextResponse.json(
+        { error: errorMessage },
+        { status: response.status }
+      )
     }
 
-    const data = await response.json()
+    const responseText = await response.text()
+    console.log('n8n raw response received:', responseText)
+
+    let data
+    try {
+      data = responseText ? JSON.parse(responseText) : {}
+    } catch (e) {
+      console.error('Failed to parse n8n response as JSON:', e)
+      return NextResponse.json(
+        { error: 'Invalid response from generation service' },
+        { status: 502 }
+      )
+    }
     
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error generating blog post:', error)
+    const message = error instanceof Error ? error.message : 'Failed to generate blog post'
     return NextResponse.json(
-      { error: 'Failed to generate blog post' },
+      { error: message },
       { status: 500 }
     )
   }

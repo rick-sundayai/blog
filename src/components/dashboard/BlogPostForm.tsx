@@ -110,7 +110,8 @@ export default function BlogPostForm({
       }))
     } catch (error) {
       console.error("Error generating content:", error)
-      alert("Failed to generate content. Please try again.")
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate content. Please try again."
+      alert(errorMessage)
     } finally {
       setIsGenerating(false)
     }
