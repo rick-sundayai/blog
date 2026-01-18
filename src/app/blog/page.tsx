@@ -25,16 +25,11 @@ export default function BlogPage() {
   const { data: postsData, isLoading, error } = useBlogPosts(filters)
   const trackView = useTrackPostView()
 
-  const categories = ['All', ...(categoriesData?.map(cat => cat.name) || [])]
+  const categories = categoriesData || []
 
-  const handleCategoryChange = (category: string) => {
-    setActiveCategory(category === 'All' ? '' : category.toLowerCase())
+  const handleCategoryChange = (categorySlug: string) => {
+    setActiveCategory(categorySlug === 'all' ? '' : categorySlug)
   }
-
-  // No longer needed as ViewTracker is on the destination page
-  // const handlePostClick = (postId: string) => {
-  //   trackView.mutate({ postId })
-  // }
 
   if (error) {
     return (
@@ -83,20 +78,28 @@ export default function BlogPage() {
               />
             </div>
 
-            {/* Category Filters */}
             <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                onClick={() => handleCategoryChange('all')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  !activeCategory
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+              >
+                All
+              </button>
               {categories.map((category) => (
                 <button
-                  key={category}
-                  onClick={() => handleCategoryChange(category)}
+                  key={category.id}
+                  onClick={() => handleCategoryChange(category.slug)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    (category === 'All' && !activeCategory) || 
-                    (category.toLowerCase() === activeCategory)
+                    category.slug === activeCategory
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`}
                 >
-                  {category}
+                  {category.name}
                 </button>
               ))}
             </div>

@@ -120,11 +120,14 @@ export default function BlogPostForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // If minimal, we might need a temporary title if the backend/n8n requires it
     const submissionData = { ...formData }
-    if (isMinimal && !submissionData.title) {
-      submissionData.title = "Generated Blog Post" // Placeholder, n8n will override
-    }
+    // Clean up empty fields to null for database compatibility (especially UUIDs)
+    Object.keys(submissionData).forEach(key => {
+      const k = key as keyof typeof submissionData;
+      if (submissionData[k] === "") {
+        (submissionData as any)[k] = null;
+      }
+    });
     
     await onSubmit(submissionData)
   }

@@ -238,10 +238,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Article Content */}
           <div className="prose prose-invert prose-lg max-w-none mb-12">
             {post.content ? (
-              // In a real app, you&apos;d use a markdown renderer here
-              <div className="whitespace-pre-wrap leading-relaxed">
-                {post.content}
-              </div>
+              <div 
+                className="leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
             ) : (
               <div className="text-center py-16 bg-muted/20 rounded-xl">
                 <p className="text-muted-foreground text-lg">

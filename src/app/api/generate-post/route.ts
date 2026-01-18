@@ -5,9 +5,9 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { title } = body
 
-    if (!title) {
+    if (!body.title && !body.content) {
       return NextResponse.json(
-        { error: 'Title is required' },
+        { error: 'Title or Content is required for generation' },
         { status: 400 }
       )
     }

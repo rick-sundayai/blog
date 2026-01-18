@@ -31,23 +31,25 @@ export function useBlogPosts(filters: BlogPostFilters = {}) {
     queryKey: ['blog-posts', filters],
     queryFn: async (): Promise<BlogPostsResponse> => {
       const supabase = createClient()
+      const categorySelect = `category:blog_categories!blog_posts_category_id_fkey${filters.category ? '!inner' : ''}(
+        id,
+        name,
+        slug,
+        color
+      )`
+
       let query = supabase
         .from(TABLE_NAMES.BLOG_POSTS)
         .select(`
           *,
-          category:blog_categories!blog_posts_category_id_fkey(
-            id,
-            name,
-            slug,
-            color
-          ),
+          ${categorySelect},
           author:user_profiles!blog_posts_author_id_fkey(
             user_id,
             full_name,
             email,
             avatar_url
           )
-        `)
+        `, { count: 'exact' })
         .eq('status', 'published')
         .not('published_at', 'is', null)
         .lte('published_at', new Date().toISOString())
@@ -73,7 +75,7 @@ export function useBlogPosts(filters: BlogPostFilters = {}) {
       const offset = filters.offset || 0
       query = query.range(offset, offset + limit - 1)
 
-      const { data, error, count } = await query
+      const { data, error, count } = await (query as any)
 
       if (error) {
         throw new Error(`Failed to fetch blog posts: ${error.message}`)

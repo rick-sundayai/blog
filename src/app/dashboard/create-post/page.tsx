@@ -4,14 +4,12 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { CreateBlogPostForm } from "@/lib/types/blog"
-import { useCreateBlogPost } from "@/lib/queries/blog"
 import BlogPostForm from "@/components/dashboard/BlogPostForm"
 import LoadingOverlay from "@/components/dashboard/LoadingOverlay"
 
 export default function CreatePostPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const createPost = useCreateBlogPost()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
@@ -42,24 +40,19 @@ export default function CreatePostPage() {
         throw new Error(errorData.error || errorData.message || "Failed to trigger blog generation")
       }
       
-      const generatedData = await response.json()
-      console.log("Saving generated post to database:", generatedData)
+      const result = await response.json()
+      console.log("n8n generation result:", result)
 
-      // 2. Save the generated data to Supabase
-      // Note: We merging the original content with generated fields
-      const newPost = await createPost.mutateAsync({
-        title: generatedData.title || data.title || "Generated Blog Post",
-        content: generatedData.content || data.content,
-        excerpt: generatedData.excerpt || data.excerpt || "",
-        featured_image_url: generatedData.featured_image_url || data.featured_image_url || "",
-        status: "draft",
-        author_id: user.id,
-        category_id: generatedData.category_id || data.category_id,
-        // n8n might not return a slug, the create mutation handles it
-      })
+      // 2. Redirect to the edit page for the new post
+      // Robustly handle different response formats from n8n
+      const postId = result.id || result.postId || (result.url ? result.url.split('/').pop() : null)
       
-      // 3. Redirect to the edit page for the new post
-      router.push(`/dashboard/edit-post/${newPost.id}`)
+      if (postId) {
+        router.push(`/dashboard/edit-post/${postId}`)
+      } else {
+        console.error("No post ID returned from generation service:", result)
+        throw new Error("Blog post was generated but we couldn't find the ID to redirect you. Please check your dashboard.")
+      }
     } catch (err) {
       const error = err as Error
       console.error("Failed to create post:", error)
