@@ -1,7 +1,11 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@/lib/supabase/server'
 
-export const runtime = 'edge'
+
+// Force dynamic rendering to allow database access
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // Revalidate every hour
+
 
 // Image metadata
 export const alt = 'Sunday AI Work Blog Post'
@@ -12,11 +16,11 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: { slug: string } }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { slug } = await params
   
   // Fetch post data
-  const { data: post } = await (await supabase)
+  const { data: post } = await supabase
     .from('blog_posts')
     .select('title')
     .eq('slug', slug)
