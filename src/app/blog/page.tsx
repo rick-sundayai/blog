@@ -23,7 +23,6 @@ export default function BlogPage() {
 
   const { data: categoriesData } = useBlogCategories()
   const { data: postsData, isLoading, error } = useBlogPosts(filters)
-  const trackView = useTrackPostView()
 
   const categories = categoriesData || []
 

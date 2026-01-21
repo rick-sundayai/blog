@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
     '/blog',
     '/contact',
     '/subscribe',
-    '/auth' // Covers /auth/login, /auth/register, etc.
+    '/auth' // Covers /auth/login and /auth/reset-password
   ]
   
   // Check if the current route is public

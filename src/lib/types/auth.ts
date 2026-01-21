@@ -8,10 +8,10 @@ export interface User {
   updated_at?: string
   app_metadata?: {
     provider?: string
-    [key: string]: any
+    [key: string]: unknown
   }
   user_metadata?: {
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 
@@ -22,6 +22,8 @@ export interface UserProfile {
   first_name: string
   last_name: string
   full_name: string
+  avatar_url?: string
+  is_admin: boolean
   created_at: string
   updated_at: string
 }
@@ -31,13 +33,6 @@ export interface LoginForm {
   password: string
 }
 
-export interface RegisterForm {
-  email: string
-  password: string
-  confirmPassword: string
-  firstName: string
-  lastName: string
-}
 
 export interface ResetPasswordForm {
   email: string
@@ -47,8 +42,8 @@ export interface AuthContextType {
   user: User | null
   profile: UserProfile | null
   loading: boolean
-  signIn: (credentials: LoginForm) => Promise<{ success: boolean; error?: string }>
-  signUp: (credentials: RegisterForm) => Promise<{ success: boolean; error?: string }>
+  isAdmin: boolean
+  signIn: (credentials: LoginForm) => Promise<{ success: boolean; error: string | null }>
   signOut: () => Promise<void>
-  resetPassword: (data: ResetPasswordForm) => Promise<{ success: boolean; error?: string }>
+  resetPassword: (data: ResetPasswordForm) => Promise<{ success: boolean; error: string | null }>
 }

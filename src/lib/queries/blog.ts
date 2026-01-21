@@ -75,6 +75,7 @@ export function useBlogPosts(filters: BlogPostFilters = {}) {
       const offset = filters.offset || 0
       query = query.range(offset, offset + limit - 1)
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error, count } = await (query as any)
 
       if (error) {
@@ -141,7 +142,7 @@ export function useBlogPost(slug: string, enabled = true) {
       // Transform tags data structure
       const transformedData = {
         ...data,
-        tags: data.tags?.map((tag: { blog_tags: any }) => tag.blog_tags).filter(Boolean) || [],
+        tags: data.tags?.map((tag: { blog_tags: BlogTag }) => tag.blog_tags).filter(Boolean) || [],
       }
 
       return transformedData
@@ -250,7 +251,7 @@ export function useAdminBlogPost(id: string) {
       // Transform tags data structure
       const transformedData = {
         ...data,
-        tags: data.tags?.map((tag: { blog_tags: any }) => tag.blog_tags).filter(Boolean) || [],
+        tags: data.tags?.map((tag: { blog_tags: BlogTag }) => tag.blog_tags).filter(Boolean) || [],
       }
 
       return transformedData
@@ -394,10 +395,15 @@ export function useUpdateBlogPost() {
       queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] })
       queryClient.invalidateQueries({ queryKey: ['blog-post', updatedPost.slug] })
+      queryClient.invalidateQueries({ queryKey: ['admin-blog-post', updatedPost.id] })
 
       // Update specific post in cache
       queryClient.setQueryData<BlogPost>(
         ['blog-post', updatedPost.slug],
+        updatedPost
+      )
+      queryClient.setQueryData<BlogPost>(
+        ['admin-blog-post', updatedPost.id],
         updatedPost
       )
     },

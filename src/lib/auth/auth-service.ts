@@ -1,5 +1,5 @@
 import { createClient } from '../supabase/client'
-import type { LoginForm, RegisterForm, ResetPasswordForm, User, UserProfile } from '../types/auth'
+import type { LoginForm, ResetPasswordForm, User, UserProfile } from '../types/auth'
 
 export class AuthService {
   private supabase = createClient()
@@ -23,30 +23,6 @@ export class AuthService {
     }
   }
 
-  async signUp({ email, password, firstName, lastName }: RegisterForm) {
-    try {
-      const { data, error } = await this.supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName
-          }
-        }
-      })
-
-      if (error) throw error
-
-      return { success: true, user: data.user, error: null }
-    } catch (error) {
-      return { 
-        success: false, 
-        user: null,
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      }
-    }
-  }
 
   async signOut() {
     try {
@@ -116,7 +92,7 @@ export class AuthService {
     }
   }
 
-  onAuthStateChange(callback: (user: any) => void) {
+  onAuthStateChange(callback: (user: User | null) => void) {
     return this.supabase.auth.onAuthStateChange((event, session) => {
       callback(session?.user ?? null)
     })

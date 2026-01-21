@@ -5,7 +5,8 @@ import { ArrowLeft, Calendar, Clock, Eye, User } from 'lucide-react'
 import Header from '@/components/Header'
 import ViewTracker from '@/components/ViewTracker'
 import { createClient } from '@/lib/supabase/server'
-import { TABLE_NAMES } from '@/lib/types/blog'
+import { TABLE_NAMES, BlogTag } from '@/lib/types/blog'
+import { markdownToSafeHtml } from '@/lib/utils/sanitize'
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
@@ -48,10 +49,16 @@ async function getBlogPost(slug: string) {
     return null
   }
 
+  // Sanitize content - convert markdown to safe HTML
+  const sanitizedContent = data.content
+    ? await markdownToSafeHtml(data.content)
+    : null
+
   // Transform tags data structure
   const transformedData = {
     ...data,
-    tags: data.tags?.map((tag: { blog_tags: any }) => tag.blog_tags).filter(Boolean) || [],
+    content: sanitizedContent,
+    tags: data.tags?.map((tag: { blog_tags: BlogTag }) => tag.blog_tags).filter(Boolean) || [],
   }
 
   return transformedData
@@ -74,7 +81,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     description: post.excerpt,
     keywords: [
       post.category?.name || '',
-      ...post.tags.map((tag: any) => tag.name),
+      ...post.tags.map((tag: BlogTag) => tag.name),
       'AI',
       'automation',
       'technology',
@@ -259,7 +266,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="mb-12">
               <h3 className="text-lg font-semibold mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag: any) => (
+                {post.tags.map((tag: BlogTag) => (
                   <span
                     key={tag.id}
                     className="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-full hover:bg-muted/80 transition-colors"

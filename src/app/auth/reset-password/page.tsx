@@ -30,7 +30,8 @@ export default function ResetPasswordPage() {
       } else {
         setError(result.error || 'Failed to send reset email')
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Password reset error:', err)
       setError('An unexpected error occurred')
     } finally {
       setIsSubmitting(false)

@@ -199,7 +199,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="text-center py-12 text-gray-400">
-               <p className="mb-4">You haven't created any posts yet.</p>
+               <p className="mb-4">You haven&apos;t created any posts yet.</p>
                <a 
                 href="/dashboard/create-post"
                 className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-colors duration-200"

@@ -4,9 +4,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    if (!body.title && !body.content) {
+    if (!body.content || !body.instructions) {
       return NextResponse.json(
-        { error: 'Title or Content is required for generation' },
+        { error: 'Content and Instructions are required for refinement' },
         { status: 400 }
       )
     }
@@ -21,14 +21,20 @@ export async function POST(req: Request) {
       )
     }
 
-    console.log('Sending request to n8n:', { url: n8nWebhookUrl, body })
+    // We add a flag or structure that n8n can use to distinguish refinement from initial generation
+    const payload = {
+      ...body,
+      is_refinement: true
+    }
+
+    console.log('Sending refinement request to n8n:', { url: n8nWebhookUrl, payload })
 
     const response = await fetch(n8nWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     })
 
     if (!response.ok) {
@@ -41,16 +47,15 @@ export async function POST(req: Request) {
           errorMessage = errorData.error
         }
       } catch (e) {
-        // If not JSON, try text
         try {
           const errorText = await response.text()
           if (errorText) errorMessage = errorText
         } catch (t_err) {
-          // Ignore text parsing errors
+          // Ignore
         }
       }
       
-      console.error(`n8n error detail:`, errorMessage)
+      console.error(`n8n refinement error detail:`, errorMessage)
       return NextResponse.json(
         { error: errorMessage },
         { status: response.status }
@@ -58,7 +63,7 @@ export async function POST(req: Request) {
     }
 
     const responseText = await response.text()
-    console.log('n8n raw response received:', responseText)
+    console.log('n8n refinement raw response received:', responseText)
 
     let data
     try {
@@ -73,8 +78,8 @@ export async function POST(req: Request) {
     
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Error generating blog post:', error)
-    const message = error instanceof Error ? error.message : 'Failed to generate blog post'
+    console.error('Error refining blog post:', error)
+    const message = error instanceof Error ? error.message : 'Failed to refine blog post'
     return NextResponse.json(
       { error: message },
       { status: 500 }

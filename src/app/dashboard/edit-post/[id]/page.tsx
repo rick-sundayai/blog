@@ -82,6 +82,7 @@ export default function EditPostPage() {
       error={updatePostMutation.error as Error}
       submitLabel="Update Post"
       isEditMode={true}
+      postId={post.id}
     />
   )
 }

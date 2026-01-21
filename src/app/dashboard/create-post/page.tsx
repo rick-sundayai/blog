@@ -44,8 +44,9 @@ export default function CreatePostPage() {
       console.log("n8n generation result:", result)
 
       // 2. Redirect to the edit page for the new post
-      // Robustly handle different response formats from n8n
-      const postId = result.id || result.postId || (result.url ? result.url.split('/').pop() : null)
+      // Robustly handle different response formats from n8n (sometimes it returns an array [ { ... } ])
+      const responseData = Array.isArray(result) ? result[0] : result
+      const postId = responseData?.id || responseData?.postId || (responseData?.url ? responseData.url.split('/').pop() : null)
       
       if (postId) {
         router.push(`/dashboard/edit-post/${postId}`)

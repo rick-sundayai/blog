@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Mail, CheckCircle } from 'lucide-react'
+import Link from 'next/link'
 import Header from '@/components/Header'
 
 export default function SubscribePage() {
@@ -127,18 +128,18 @@ export default function SubscribePage() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <a
+                  <Link
                     href="/blog"
                     className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-colors duration-200"
                   >
                     Read the Blog
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/about"
                     className="inline-flex items-center px-6 py-3 bg-transparent hover:bg-muted/50 text-foreground font-semibold rounded-lg border border-border transition-colors duration-200"
                   >
                     Learn More
-                  </a>
+                  </Link>
                 </div>
               </div>
             )}

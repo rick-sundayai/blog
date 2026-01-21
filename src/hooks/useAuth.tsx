@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { authService } from '@/lib/auth/auth-service'
-import type { AuthContextType, User, UserProfile, LoginForm, RegisterForm, ResetPasswordForm } from '@/lib/types/auth'
+import type { AuthContextType, User, UserProfile, LoginForm, ResetPasswordForm } from '@/lib/types/auth'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -50,10 +50,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return result
   }
 
-  const signUp = async (credentials: RegisterForm) => {
-    const result = await authService.signUp(credentials)
-    return result
-  }
 
   const signOut = async () => {
     await authService.signOut()
@@ -65,13 +61,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return authService.resetPassword(data)
   }
 
+  // Compute isAdmin from profile
+  const isAdmin = profile?.is_admin ?? false
+
   return (
     <AuthContext.Provider value={{
       user,
       profile,
       loading,
+      isAdmin,
       signIn,
-      signUp,
       signOut,
       resetPassword
     }}>
