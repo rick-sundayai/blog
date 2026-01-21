@@ -13,10 +13,11 @@ export default function SubscribePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
-    // Simulate subscription
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
+
+    const subject = encodeURIComponent('Newsletter Subscription Request')
+    const body = encodeURIComponent(`I would like to subscribe to the Sunday AI Work newsletter.\n\nMy email: ${email}`)
+    window.location.href = `mailto:hello@sundayaiwork.com?subject=${subject}&body=${body}`
+
     setIsSubscribed(true)
     setIsSubmitting(false)
     setEmail('')
